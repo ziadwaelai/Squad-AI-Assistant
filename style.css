@@ -1,79 +1,97 @@
+/* --- Base Styles --- */
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #e9ebee; /* A neutral background to make the popup stand out */
-    width: 300px;
+    /* NEW: A darker, gradient background to enhance the glass effect */
+    background: linear-gradient(175deg, #2a2833, #1c1b22);
+    width: 320px;
+    height: 350px;
     margin: 0;
-    padding: 16px;
-    color: #ffffff; /* Set default text color to white for the new card */
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
+/* --- Glass Card Effect --- */
 .card {
-    /* Applying the gradient from the trigger button */
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 16px; /* More rounded corners for a modern look */
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    overflow: hidden; /* Ensures content respects the border-radius */
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    /* NEW: Gradient background for the card */
+    background: linear-gradient(135deg, rgba(80, 75, 120, 0.4), rgba(43, 42, 51, 0.2));
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px); /* For Safari */
+    border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.card-header {
+/* --- Row Layout --- */
+.row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 20px;
-    /* A translucent border creates a "glassmorphism" effect */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.row:last-child {
+    border-bottom: none;
 }
 
-.icon {
-    font-size: 28px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Add a subtle shadow to the icon */
+/* --- Icons --- */
+.icon-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+.icon-container svg {
+    width: 24px;
+    height: 24px;
+    color: #a9a8b2; /* A light grey for the icons */
 }
 
+/* Specific style for the main header icon */
+.header-icon {
+    background-color: rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    width: 48px;
+    height: 48px;
+}
+.header-icon svg {
+    color: #ffffff; /* White icon for the header */
+    width: 28px;
+    height: 28px;
+}
+
+/* --- Text Styles --- */
+.text-container {
+    flex-grow: 1;
+}
 .title {
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0;
-}
-
-.card-body {
-    padding: 20px;
-}
-
-.setting-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    /* Add some vertical spacing between rows */
-    margin-bottom: 16px;
-}
-
-.setting-row:last-child {
-    margin-bottom: 0; /* Remove margin from the last row */
-}
-
-.setting-label {
-    font-weight: 500;
     font-size: 16px;
-}
-
-.card-footer {
-    padding: 12px 20px;
-    min-height: 20px;
-}
-
-#status-message {
-    text-align: center;
-    font-size: 14px;
     font-weight: 600;
-    opacity: 0.9;
+    color: #ffffff;
+}
+.subtitle {
+    font-size: 13px;
+    font-weight: 400;
+    color: #a9a8b2; /* Light grey for subtitles */
 }
 
-/* --- Redesigned Toggle Switch --- */
+.header-row .title {
+    font-size: 18px;
+}
+.header-row .subtitle {
+    font-size: 14px;
+}
+
+/* --- New Toggle Switch Design --- */
 .switch {
     position: relative;
     display: inline-block;
-    width: 50px;
-    height: 28px;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
 }
 
 .switch input {
@@ -89,35 +107,27 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    /* Style for the "Off" state on a dark background */
-    background-color: rgba(0, 0, 0, 0.25);
+    background-color: rgba(255, 255, 255, 0.15);
     transition: .4s;
+    border-radius: 24px;
 }
 
 .slider:before {
     position: absolute;
     content: "";
-    height: 20px;
-    width: 20px;
-    left: 4px;
-    bottom: 4px;
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
     background-color: white;
     transition: .4s;
-}
-
-/* Style for the "On" state with a vibrant color */
-input:checked+.slider {
-    background-color: #32d74b; /* A vibrant green for the "enabled" state */
-}
-
-input:checked+.slider:before {
-    transform: translateX(22px);
-}
-
-.slider.round {
-    border-radius: 34px;
-}
-
-.slider.round:before {
     border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #7e42f5; /* A vibrant purple for the "On" state */
+}
+
+input:checked + .slider:before {
+    transform: translateX(20px);
 }

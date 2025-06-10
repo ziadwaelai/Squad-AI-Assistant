@@ -6,31 +6,48 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
     <div class="card">
-        <div class="card-header">
-            <span class="icon">🤖</span>
-            <h1 class="title">Social AI Assistant</h1>
-        </div>
-        <div class="card-body">
-            <div class="setting-row">
-                <label for="enable-toggle" class="setting-label">Enable Assistant</label>
-                <label class="switch">
-                    <input type="checkbox" id="enable-toggle">
-                    <span class="slider round"></span>
-                </label>
+        <div class="row header-row">
+            <div class="icon-container header-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
             </div>
-            <div class="setting-row">
-                <label for="fast-mode-toggle" class="setting-label">Fast Mode</label>
-                <label class="switch">
-                    <input type="checkbox" id="fast-mode-toggle">
-                    <span class="slider round"></span>
-                </label>
+            <div class="text-container">
+                <div class="title">Social AI Assistant</div>
+                <div class="subtitle">Intelligent automation for social media</div>
             </div>
         </div>
-        <div class="card-footer">
-            <p id="status-message"></p>
+
+        <div class="row">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 0 2l-.15.08a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1 0-2l.15-.08a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            </div>
+            <div class="text-container">
+                <div class="title">Enable Assistant</div>
+                <div class="subtitle">Activate AI-powered automation</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="enable-toggle">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="row">
+            <div class="icon-container">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            </div>
+            <div class="text-container">
+                <div class="title">Fast Mode</div>
+                <div class="subtitle">Enhanced processing speed</div>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="fast-mode-toggle">
+                <span class="slider"></span>
+            </label>
         </div>
     </div>
+    
+    <div id="status-message" style="display: none;"></div>
     <script src="popup.js"></script>
 </body>
 </html>
