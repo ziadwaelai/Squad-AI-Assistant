@@ -1,30 +1,43 @@
 document.addEventListener('DOMContentLoaded', () => {
     const enableToggle = document.getElementById('enable-toggle');
+    const fastModeToggle = document.getElementById('fast-mode-toggle');
     const statusMessage = document.getElementById('status-message');
 
-    // Load the initial state of the toggle from storage
-    chrome.storage.sync.get(['isEnabled'], (result) => {
+    // Load initial states from storage
+    chrome.storage.sync.get(['isEnabled', 'isFastModeEnabled'], (result) => {
         enableToggle.checked = result.isEnabled !== false;
+        fastModeToggle.checked = result.isFastModeEnabled === true;
     });
 
-    // Listen for changes on the toggle switch
+    // Listener for the main enable/disable toggle
     enableToggle.addEventListener('change', () => {
         const isEnabled = enableToggle.checked;
         chrome.storage.sync.set({ isEnabled: isEnabled }, () => {
-            const statusText = isEnabled ? 'Assistant Enabled' : 'Assistant Disabled';
-            statusMessage.textContent = statusText;
-            statusMessage.style.color = '#1c1e21';
-            setTimeout(() => { statusMessage.textContent = ''; }, 2000);
-
-            // Notify the active content script of the state change
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-                if (tabs[0]?.id) {
-                   chrome.tabs.sendMessage(tabs[0].id, {
-                       action: 'updateState',
-                       isEnabled: isEnabled
-                   });
-                }
-            });
+            showStatus(isEnabled ? 'Assistant Enabled' : 'Assistant Disabled');
+            notifyContentScript('updateState', { isEnabled });
         });
     });
+
+    // Listener for the new Fast Mode toggle
+    fastModeToggle.addEventListener('change', () => {
+        const isFastModeEnabled = fastModeToggle.checked;
+        chrome.storage.sync.set({ isFastModeEnabled: isFastModeEnabled }, () => {
+            showStatus(isFastModeEnabled ? 'Fast Mode Enabled' : 'Fast Mode Disabled');
+            notifyContentScript('updateFastMode', { isFastModeEnabled });
+        });
+    });
+
+    function showStatus(message) {
+        statusMessage.textContent = message;
+        statusMessage.style.color = '#1c1e21';
+        setTimeout(() => { statusMessage.textContent = ''; }, 2000);
+    }
+
+    function notifyContentScript(action, data) {
+        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+            if (tabs[0]?.id) {
+               chrome.tabs.sendMessage(tabs[0].id, { action, ...data });
+            }
+        });
+    }
 });

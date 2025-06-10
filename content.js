@@ -1,7 +1,7 @@
 /**
  * @file content.js
  * @description Injects the AI Assistant UI onto the page. This version includes
- * robust error handling to prevent crashes when the extension context is lost.
+ * robust error handling and a "Fast Mode" for instant generation.
  */
 class SocialAIAssistant {
     constructor() {
@@ -10,9 +10,10 @@ class SocialAIAssistant {
         this.triggerButton = null;
         this.isButtonShowing = false;
         this.assistantEnabled = true; // Default state
+        this.isFastModeEnabled = false; // NEW: Fast Mode state
         this.isActive = false; // Tracks if listeners are active
 
-        // Bind 'this' for all handlers to ensure context is always correct
+        // Bind 'this' for all handlers
         this.handleTextSelection = this.handleTextSelection.bind(this);
         this.handleOutsideClick = this.handleOutsideClick.bind(this);
         this.hideAIButton = this.hideAIButton.bind(this);
@@ -22,8 +23,9 @@ class SocialAIAssistant {
     }
 
     async init() {
-        const result = await chrome.storage.sync.get('isEnabled');
+        const result = await chrome.storage.sync.get(['isEnabled', 'isFastModeEnabled']);
         this.assistantEnabled = result.isEnabled !== false;
+        this.isFastModeEnabled = result.isFastModeEnabled === true; // Load fast mode state
 
         if (this.assistantEnabled) {
             this.activate();
@@ -53,6 +55,10 @@ class SocialAIAssistant {
                 this.assistantEnabled = request.isEnabled;
                 this.assistantEnabled ? this.activate() : this.deactivate();
             }
+            // NEW: Listen for Fast Mode state changes
+            if (request.action === 'updateFastMode') {
+                this.isFastModeEnabled = request.isFastModeEnabled;
+            }
         });
     }
 
@@ -77,7 +83,13 @@ class SocialAIAssistant {
             if (text.length > 5) {
                 this.selectedText = text;
                 this.selectionRange = selection.getRangeAt(0).cloneRange();
-                this.showAIButton();
+
+                // MODIFIED: Check for Fast Mode
+                if (this.isFastModeEnabled) {
+                    this.handleAIButtonClick(); // Trigger AI directly
+                } else {
+                    this.showAIButton(); // Or just show the button
+                }
             } else if (!text) {
                 this.hideAIButton();
             }
@@ -105,15 +117,13 @@ class SocialAIAssistant {
         this.isButtonShowing = false;
     }
 
-  handleOutsideClick(e) {
+    handleOutsideClick(e) {
       if (this.isButtonShowing && e.target.closest('#ai-trigger-btn') === null) {
           this.hideAIButton();
       }
-  }
+    }
 
     handleAIButtonClick() {
-        // --- FIX ---
-        // Check if the chrome.runtime API is available before using it.
         if (typeof chrome?.runtime?.sendMessage !== 'function') {
             console.error("Social AI Assistant: Cannot connect to the extension's background script.");
             this.showToast("❌ Error: Connection to extension failed.");
@@ -121,15 +131,25 @@ class SocialAIAssistant {
             return;
         }
 
-        this.triggerButton.innerHTML = `<span class="ai-icon">⏳</span><span class="ai-text">Generating...</span>`;
-        this.triggerButton.style.pointerEvents = 'none';
+        // MODIFIED: Give feedback based on the mode
+        if (this.isButtonShowing) {
+            // Normal mode: update the button
+            this.triggerButton.innerHTML = `<span class="ai-icon">⏳</span><span class="ai-text">Generating...</span>`;
+            this.triggerButton.style.pointerEvents = 'none';
+        } else {
+            // Fast Mode: show a toast
+            this.showToast('⏳ Generating AI suggestion...');
+        }
 
         chrome.runtime.sendMessage({
             action: "processTextWithAI",
             text: this.selectedText
         }, (response) => {
-            this.triggerButton.style.pointerEvents = 'auto';
-            this.hideAIButton();
+            // Hide the button if it was showing
+            if (this.isButtonShowing) {
+                this.triggerButton.style.pointerEvents = 'auto';
+                this.hideAIButton();
+            }
 
             if (response && response.success) {
                 this.copyToClipboard(response.data);
@@ -200,7 +220,6 @@ class SocialAIAssistant {
         const button = document.createElement('div');
         button.id = 'ai-trigger-btn';
         button.className = 'ai-assistant-trigger';
-        // Use the pre-bound method for the event listener
         button.addEventListener('click', this.handleAIButtonClick);
         document.body.appendChild(button);
 
@@ -208,7 +227,6 @@ class SocialAIAssistant {
         toast.id = 'ai-assistant-toast';
         document.body.appendChild(toast);
 
-        // Save the button element to the class instance
         this.triggerButton = button;
     }
 }

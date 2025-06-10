@@ -1,54 +1,123 @@
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    background-color: #f0f2f5;
-    width: 300px; /* Reduced width */
+    background-color: #e9ebee; /* A neutral background to make the popup stand out */
+    width: 300px;
     margin: 0;
     padding: 16px;
-    color: #1c1e21;
+    color: #ffffff; /* Set default text color to white for the new card */
 }
+
 .card {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    /* Applying the gradient from the trigger button */
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px; /* More rounded corners for a modern look */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    overflow: hidden; /* Ensures content respects the border-radius */
 }
+
 .card-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 16px;
-    border-bottom: 1px solid #dddfe2;
+    padding: 20px;
+    /* A translucent border creates a "glassmorphism" effect */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
-.icon { font-size: 24px; }
-.title { font-size: 18px; font-weight: 600; margin: 0; }
-.card-body { padding: 16px; }
+
+.icon {
+    font-size: 28px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2); /* Add a subtle shadow to the icon */
+}
+
+.title {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.card-body {
+    padding: 20px;
+}
+
 .setting-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    /* Add some vertical spacing between rows */
+    margin-bottom: 16px;
 }
-.setting-label { font-weight: 500; font-size: 15px; }
-.card-footer { padding: 8px 16px; min-height: 20px; }
+
+.setting-row:last-child {
+    margin-bottom: 0; /* Remove margin from the last row */
+}
+
+.setting-label {
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.card-footer {
+    padding: 12px 20px;
+    min-height: 20px;
+}
+
 #status-message {
     text-align: center;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
+    opacity: 0.9;
 }
+
+/* --- Redesigned Toggle Switch --- */
 .switch {
     position: relative;
     display: inline-block;
     width: 50px;
     height: 28px;
 }
-.switch input { opacity: 0; width: 0; height: 0; }
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
 .slider {
-    position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #ccd0d5; transition: .4s;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Style for the "Off" state on a dark background */
+    background-color: rgba(0, 0, 0, 0.25);
+    transition: .4s;
 }
+
 .slider:before {
-    position: absolute; content: ""; height: 20px; width: 20px;
-    left: 4px; bottom: 4px; background-color: white; transition: .4s;
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
 }
-input:checked+.slider { background-color: #1877f2; }
-input:checked+.slider:before { transform: translateX(22px); }
-.slider.round { border-radius: 34px; }
-.slider.round:before { border-radius: 50%; }
+
+/* Style for the "On" state with a vibrant color */
+input:checked+.slider {
+    background-color: #32d74b; /* A vibrant green for the "enabled" state */
+}
+
+input:checked+.slider:before {
+    transform: translateX(22px);
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
