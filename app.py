@@ -3,7 +3,6 @@ import google.generativeai as genai
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
-import gspread
 
 # Load environment variables from .env file
 load_dotenv()
