@@ -4,7 +4,7 @@
  */
 
 // The URL of your local Flask server
-const FLASK_API_URL = "http://127.0.0.1:5000/process";
+const FLASK_API_URL = "http://128.140.37.194:5005/process";
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "processTextWithAI") {
