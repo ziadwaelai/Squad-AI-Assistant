@@ -8,14 +8,15 @@ const FLASK_API_URL = "http://128.140.37.194:5005/process";
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "processTextWithAI") {
-    console.log("Forwarding text to Flask backend:", request.text);
-
-    fetch(FLASK_API_URL, {
+    console.log("Forwarding text to Flask backend:", request.text);    fetch(FLASK_API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ text: request.text }),
+      body: JSON.stringify({ 
+        text: request.text,
+        mode: request.mode || "mentions" // Default to mentions if not specified
+      }),
     })
     .then(response => {
       if (!response.ok) {

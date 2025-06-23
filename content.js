@@ -11,6 +11,7 @@ class SocialAIAssistant {
         this.isButtonShowing = false;
         this.assistantEnabled = true; // Default state
         this.isFastModeEnabled = false; // NEW: Fast Mode state
+        this.isDmsModeEnabled = false; // NEW: DMS Mode state
         this.isActive = false; // Tracks if listeners are active
 
         // Bind 'this' for all handlers
@@ -23,9 +24,10 @@ class SocialAIAssistant {
     }
 
     async init() {
-        const result = await chrome.storage.sync.get(['isEnabled', 'isFastModeEnabled']);
+        const result = await chrome.storage.sync.get(['isEnabled', 'isFastModeEnabled', 'isDmsModeEnabled']);
         this.assistantEnabled = result.isEnabled !== false;
         this.isFastModeEnabled = result.isFastModeEnabled === true; // Load fast mode state
+        this.isDmsModeEnabled = result.isDmsModeEnabled === true; // Load DMS mode state
 
         if (this.assistantEnabled) {
             this.activate();
@@ -55,9 +57,13 @@ class SocialAIAssistant {
                 this.assistantEnabled = request.isEnabled;
                 this.assistantEnabled ? this.activate() : this.deactivate();
             }
-            // NEW: Listen for Fast Mode state changes
+            // Listen for Fast Mode state changes
             if (request.action === 'updateFastMode') {
                 this.isFastModeEnabled = request.isFastModeEnabled;
+            }
+            // Listen for DMS Mode state changes
+            if (request.action === 'updateDmsMode') {
+                this.isDmsModeEnabled = request.isDmsModeEnabled;
             }
         });
     }
@@ -101,10 +107,9 @@ class SocialAIAssistant {
         if (this.isButtonShowing) return;
 
         const rect = this.selectionRange.getBoundingClientRect();
-        if (rect.width === 0 && rect.height === 0) return;
-
-        this.triggerButton.style.display = 'flex';
-        this.triggerButton.innerHTML = `<span class="ai-icon">🤖</span><span class="ai-text">AI Suggest</span>`;
+        if (rect.width === 0 && rect.height === 0) return;        this.triggerButton.style.display = 'flex';
+        const modeText = this.isDmsModeEnabled ? "DMS" : "Mentions";
+        this.triggerButton.innerHTML = `<span class="ai-icon">🤖</span><span class="ai-text">AI ${modeText}</span>`;
         this.triggerButton.style.left = `${window.scrollX + rect.left}px`;
         this.triggerButton.style.top = `${window.scrollY + rect.bottom + 5}px`;
         this.isButtonShowing = true;
@@ -139,11 +144,10 @@ class SocialAIAssistant {
         } else {
             // Fast Mode: show a toast
             this.showToast('⏳ Generating AI suggestion...');
-        }
-
-        chrome.runtime.sendMessage({
+        }        chrome.runtime.sendMessage({
             action: "processTextWithAI",
-            text: this.selectedText
+            text: this.selectedText,
+            mode: this.isDmsModeEnabled ? "dms" : "mentions"
         }, (response) => {
             // Hide the button if it was showing
             if (this.isButtonShowing) {

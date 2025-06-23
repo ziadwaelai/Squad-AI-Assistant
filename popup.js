@@ -1,12 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
     const enableToggle = document.getElementById('enable-toggle');
     const fastModeToggle = document.getElementById('fast-mode-toggle');
+    const dmsModeToggle = document.getElementById('dms-mode-toggle');
     const statusMessage = document.getElementById('status-message');
 
     // Load initial states from storage
-    chrome.storage.sync.get(['isEnabled', 'isFastModeEnabled'], (result) => {
+    chrome.storage.sync.get(['isEnabled', 'isFastModeEnabled', 'isDmsModeEnabled'], (result) => {
         enableToggle.checked = result.isEnabled !== false;
         fastModeToggle.checked = result.isFastModeEnabled === true;
+        dmsModeToggle.checked = result.isDmsModeEnabled === true;
     });
 
     // Listener for the main enable/disable toggle
@@ -24,6 +26,15 @@ document.addEventListener('DOMContentLoaded', () => {
         chrome.storage.sync.set({ isFastModeEnabled: isFastModeEnabled }, () => {
             showStatus(isFastModeEnabled ? 'Fast Mode Enabled' : 'Fast Mode Disabled');
             notifyContentScript('updateFastMode', { isFastModeEnabled });
+        });
+    });
+
+    // Listener for the new DMS Mode toggle
+    dmsModeToggle.addEventListener('change', () => {
+        const isDmsModeEnabled = dmsModeToggle.checked;
+        chrome.storage.sync.set({ isDmsModeEnabled: isDmsModeEnabled }, () => {
+            showStatus(isDmsModeEnabled ? 'DMS Mode Enabled' : 'DMS Mode Disabled');
+            notifyContentScript('updateDmsMode', { isDmsModeEnabled });
         });
     });
 
