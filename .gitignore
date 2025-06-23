@@ -1,1 +1,8 @@
 .env
+credentials.json
+test.ipynb
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints
+# Ignore Python cache files
+__pycache__/
+tests/
