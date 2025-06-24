@@ -42,12 +42,13 @@ def process_text():
     print(f"📥 Received request data: {data}")
     if not data or 'text' not in data:
         return jsonify({"error": "Invalid request: 'text' field is required."}), 400
-
     selected_text = data['text']
-    mode=data["mode"]
+    mode = "mentions"
+    if 'mode' in data:
+        mode = data['mode']
     print(f"📝 Received text for processing: '{selected_text[:50]}...'")
     try:
-        prompt = dms.dm_tamplate(selected_text) if mode=="dms" else mentions.mentions_template(selected_text)
+        prompt = dms.dm_tamplate(selected_text) if mode == "dms" else mentions.mentions_template(selected_text)
         # Generate content
         response = model.generate_content(prompt)
         
