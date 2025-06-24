@@ -21,14 +21,15 @@ class SocialAIAssistant {
         this.handleAIButtonClick = this.handleAIButtonClick.bind(this);
         
         this.init();
-    }
-
-    async init() {
+    }    async init() {
         const result = await chrome.storage.sync.get(['isEnabled', 'isFastModeEnabled', 'isDmsModeEnabled']);
-        this.assistantEnabled = result.isEnabled !== false;
+        // Explicitly check if isEnabled is true or false (default to false if undefined/null)
+        this.assistantEnabled = result.isEnabled === true; 
         this.isFastModeEnabled = result.isFastModeEnabled === true; // Load fast mode state
         this.isDmsModeEnabled = result.isDmsModeEnabled === true; // Load DMS mode state
 
+        console.log("🔄 Social AI Assistant initializing with enabled state:", this.assistantEnabled);
+        
         if (this.assistantEnabled) {
             this.activate();
         }
@@ -41,30 +42,69 @@ class SocialAIAssistant {
         this.isActive = true;
         this.injectUI();
         this.addEventListeners();
-    }
-
-    deactivate() {
+    }    deactivate() {
         if (!this.isActive) return;
         console.log("💤 Social AI Assistant Deactivated");
         this.isActive = false;
         this.hideAIButton();
         this.removeEventListeners();
+        
+        // Remove UI elements to fully disable functionality
+        const triggerButton = document.getElementById('ai-trigger-btn');
+        if (triggerButton) triggerButton.remove();
+        this.triggerButton = null;
+        
+        const toast = document.getElementById('ai-assistant-toast');
+        if (toast) toast.remove();
     }
     
-    listenForStateChanges() {
-        chrome.runtime.onMessage.addListener((request) => {
+    // Add a new reload method for complete reset
+    reload() {
+        console.log("🔄 Social AI Assistant reloading...");
+        // First completely deactivate
+        this.deactivate();
+        
+        // Remove all injected elements
+        const styles = document.getElementById('ai-assistant-styles');
+        if (styles) styles.remove();
+        
+        // Reinitialize everything
+        this.init();
+    }
+      listenForStateChanges() {
+        chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.action === 'updateState') {
+                const wasDisabled = !this.assistantEnabled;
                 this.assistantEnabled = request.isEnabled;
+                
+                if (wasDisabled && this.assistantEnabled) {
+                    // If the extension was disabled and is now being enabled, reload the page
+                    console.log("🔄 Reloading page to fully activate extension...");
+                    location.reload();
+                    // Send response to acknowledge receipt
+                    if (sendResponse) sendResponse({ status: "reloading" });
+                    return;
+                }
+                
+                // Otherwise just activate or deactivate normally
                 this.assistantEnabled ? this.activate() : this.deactivate();
+                
+                // Send response to acknowledge receipt
+                if (sendResponse) sendResponse({ status: "updated" });
             }
             // Listen for Fast Mode state changes
             if (request.action === 'updateFastMode') {
                 this.isFastModeEnabled = request.isFastModeEnabled;
+                if (sendResponse) sendResponse({ status: "updated" });
             }
             // Listen for DMS Mode state changes
             if (request.action === 'updateDmsMode') {
                 this.isDmsModeEnabled = request.isDmsModeEnabled;
+                if (sendResponse) sendResponse({ status: "updated" });
             }
+            
+            // Return true from the event listener to indicate you wish to send a response asynchronously
+            return true;
         });
     }
 
@@ -80,9 +120,10 @@ class SocialAIAssistant {
         document.removeEventListener('keyup', this.handleTextSelection);
         document.removeEventListener('mousedown', this.handleOutsideClick);
         document.removeEventListener('scroll', this.hideAIButton);
-    }
-
-    handleTextSelection() {
+    }    handleTextSelection() {
+        // Don't process text selection if assistant is disabled
+        if (!this.assistantEnabled) return;
+        
         setTimeout(() => {
             const selection = window.getSelection();
             const text = selection.toString().trim();
@@ -126,9 +167,13 @@ class SocialAIAssistant {
       if (this.isButtonShowing && e.target.closest('#ai-trigger-btn') === null) {
           this.hideAIButton();
       }
-    }
-
-    handleAIButtonClick() {
+    }    handleAIButtonClick() {
+        // Don't process if assistant is disabled
+        if (!this.assistantEnabled) {
+            this.hideAIButton();
+            return;
+        }
+        
         if (typeof chrome?.runtime?.sendMessage !== 'function') {
             console.error("Social AI Assistant: Cannot connect to the extension's background script.");
             this.showToast("❌ Error: Connection to extension failed.");
@@ -144,7 +189,7 @@ class SocialAIAssistant {
         } else {
             // Fast Mode: show a toast
             this.showToast('⏳ Generating AI suggestion...');
-        }        chrome.runtime.sendMessage({
+        }chrome.runtime.sendMessage({
             action: "processTextWithAI",
             text: this.selectedText,
             mode: this.isDmsModeEnabled ? "dms" : "mentions"
