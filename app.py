@@ -52,12 +52,11 @@ def process_text():
         response = model.chat.completions.create(
             model="gpt-4.1", 
             messages=[
-                {"role": "system", "content": "You are a social media assistant for Ninja, a Saudi delivery app. Respond in Saudi Arabic, with an extremely concise, youthful, friendly style. Use blue heart emojis (🩵) and other appropriate emojis. Keep responses under 50 characters. Focus on quick, informal replies that match Saudi youth slang and culture."},
+                {"role": "system", "content": "أنت مساعد وسائل التواصل الاجتماعي لتطبيق نينجا للتوصيل في السعودية. رد باللهجة السعودية الشبابية بأسلوب مختصر جدًا وودي. استخدم القلوب الزرقاء (🩵) والإيموجيات المناسبة. اجعل الردود أقل من 50 حرف. ركز على الردود السريعة غير الرسمية التي تناسب مصطلحات وثقافة الشباب السعودي."},
                 {"role": "user", "content": prompt}
             ],
             max_tokens=100
         )
-        
         processed_text = response.choices[0].message.content
         print(f"✅ AI response generated successfully.")
         print(f"Processed text: '{processed_text[:50]}...'")
