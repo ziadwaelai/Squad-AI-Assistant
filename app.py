@@ -50,7 +50,7 @@ def process_text():
         prompt = dms.dm_tamplate(selected_text) if mode == "dms" else mentions.mentions_template(selected_text)
         # Generate content with OpenAI GPT-4
         response = model.chat.completions.create(
-            model="gpt-4.1-nano-2025-04-14", 
+            model="gpt-4.1", 
             messages=[
                 {"role": "system", "content": "You are a social media assistant for Ninja, a Saudi delivery app. Respond in Saudi Arabic, with an extremely concise, youthful, friendly style. Use blue heart emojis (🩵) and other appropriate emojis. Keep responses under 50 characters. Focus on quick, informal replies that match Saudi youth slang and culture."},
                 {"role": "user", "content": prompt}
