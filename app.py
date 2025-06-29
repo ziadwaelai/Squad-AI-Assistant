@@ -1,5 +1,5 @@
 import os
-import google.generativeai as genai
+import openai
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -14,13 +14,12 @@ CORS(app, resources={r"/process": {"origins": "*"}})
 
 # --- AI Model Configuration ---
 try:
-    api_key = os.getenv("Google_API_KEY")
+    api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        raise ValueError("Google_API_KEY not found in .env file.")
+        raise ValueError("OPENAI_API_KEY not found in .env file.")
 
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-2.0-flash')
-    print("🤖 Gemini AI model configured successfully.")
+    model = openai.OpenAI(api_key=api_key)
+    print("🤖 GPT-4 AI model configured successfully.")
 
 except Exception as e:
     print(f"❌ Error configuring AI model: {e}")
@@ -49,10 +48,17 @@ def process_text():
     print(f"📝 Received text for processing: '{selected_text[:50]}...'")
     try:
         prompt = dms.dm_tamplate(selected_text) if mode == "dms" else mentions.mentions_template(selected_text)
-        # Generate content
-        response = model.generate_content(prompt)
+        # Generate content with OpenAI GPT-4
+        response = model.chat.completions.create(
+            model="gpt-4.1-nano-2025-04-14", 
+            messages=[
+                {"role": "system", "content": "You are a social media assistant for Ninja, a Saudi delivery app. Respond in Saudi Arabic, with an extremely concise, youthful, friendly style. Use blue heart emojis (🩵) and other appropriate emojis. Keep responses under 50 characters. Focus on quick, informal replies that match Saudi youth slang and culture."},
+                {"role": "user", "content": prompt}
+            ],
+            max_tokens=100
+        )
         
-        processed_text = response.text
+        processed_text = response.choices[0].message.content
         print(f"✅ AI response generated successfully.")
         print(f"Processed text: '{processed_text[:50]}...'")
         
